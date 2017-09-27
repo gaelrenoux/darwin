@@ -16,12 +16,14 @@ class DarwinModule extends AbstractModule {
 @Singleton
 class Darwin(locator: FilesLocator, parser: ScriptFileParser, dbName: String) {
 
+  val files = locator.paths(dbName)
 
-  val fileContents = locator.paths(dbName) map { case (revision, stream) =>
+  val fileContents = files map { case (revision, stream) =>
     (revision, Source.fromInputStream(stream)(Codec.UTF8).getLines())
   }
 
   val scripts = fileContents map (parser.parse _).tupled
+  files.foreach(_._2.close())
 
   val (errorLefts, evolutionRights) = scripts map ScriptEngine.prepare partition(_.isLeft)
   if (errorLefts.nonEmpty) throw new IllegalArgumentException(errorLefts.map(_.left.get).mkString("\n"))
