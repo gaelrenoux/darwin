@@ -7,7 +7,7 @@ import darwin.Evolution.Values
   * and returns all scrips that must be executed.
   */
 case class Evolution(
-                      revision: String,
+                      revision: Revision,
                       defines: Seq[(String, Function[Values, Seq[String]])],
                       ups: Seq[Function[Values, Seq[String]]],
                       downs: Seq[Function[Values, Seq[String]]]

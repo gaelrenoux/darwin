@@ -34,7 +34,7 @@ class ScriptFileParser {
     }
   }
 
-  def parse(revision: String, lines: TraversableOnce[String]): Script = {
+  def parse(revision: Revision, lines: TraversableOnce[String]): Script = {
     val (lastState, script, lastAccum) =
       lines.filter(_.trim.nonEmpty).foldLeft((UnknownState: ReadingState, Script(revision), Seq.empty[String])) {
         /* State changes */

@@ -14,12 +14,12 @@ class DarwinModule extends AbstractModule {
 }
 
 @Singleton
-class Darwin(locator: FilesLocator, parser: ScriptFileParser, dbName: String) {
+class Darwin(locator: FilesLocator[Revision], parser: ScriptFileParser, dbName: String) {
 
   val files = locator.paths(dbName)
 
-  val fileContents = files map { case (revision, stream) =>
-    (revision, Source.fromInputStream(stream)(Codec.UTF8).getLines())
+  val fileContents = files map { case (revision, src) =>
+    (revision, src.getLines())
   }
 
   val scripts = fileContents map (parser.parse _).tupled

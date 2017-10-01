@@ -14,7 +14,7 @@ class ScriptFileParserSpec extends FlatSpec with Matchers {
   val path = "darwin/numbered/2.sql"
   val is = classOf[Darwin].getClassLoader.getResourceAsStream(path)
   val lines = Source.fromInputStream(is)(Codec.UTF8).getLines()
-  val parsed = parser.parse("2", lines)
+  val parsed = parser.parse(NumberedRevision(2), lines)
   is.close()
 
 
