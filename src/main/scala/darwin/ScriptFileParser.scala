@@ -3,6 +3,7 @@ package darwin
 import play.api.Logger
 
 /**
+  * Parses a script file and returns a Script object, with separated elements.
   * Created by gael on 26/09/17.
   */
 class ScriptFileParser {

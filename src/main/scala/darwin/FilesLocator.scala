@@ -10,6 +10,7 @@ import scala.io.BufferedSource
   */
 trait FilesLocator[+T <: Revision] {
 
+  /** Returns the files to parse, ordered by their revision. */
   def paths(dbName: String): Seq[(T, BufferedSource)]
 
 }

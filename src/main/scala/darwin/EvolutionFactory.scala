@@ -4,9 +4,10 @@ import darwin.Evolution.Values
 import play.api.libs.Collections
 
 /**
+  * Takes a Script and organizes the execution to produce an Evolution object.
   * Created by gael on 26/09/17.
   */
-object ScriptEngine {
+object EvolutionFactory {
 
   def prepare(script: Script): Either[String, Evolution] = {
     val definesWithVariables = script.defines map { case (v, d) => (v, d, extractVariables(d)) }
