@@ -1,8 +1,7 @@
-package darwin
+package darwin.files
 
+import darwin.model.VersionedRevision
 import org.scalatest.{FlatSpec, Matchers}
-
-import scala.io.{Codec, Source}
 
 /**
   * Created by gael on 27/09/17.
@@ -15,7 +14,7 @@ class VersionedFilesLocatorSpec extends FlatSpec with Matchers {
   val locator = new VersionedFilesLocator
 
   it should "find existing files" in {
-    val paths = locator.paths("versioned") should matchPattern {
+    locator.paths("versioned") should matchPattern {
       case Seq((VersionedRevision(1::2::3::Nil, Some("-RC1")), _), (VersionedRevision(2::1::3::Nil, Some("-RC2")), _)) =>
     }
   }

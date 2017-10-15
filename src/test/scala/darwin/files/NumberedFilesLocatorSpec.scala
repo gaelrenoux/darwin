@@ -1,5 +1,6 @@
-package darwin
+package darwin.files
 
+import darwin.model.NumberedRevision
 import org.scalatest.{FlatSpec, Matchers}
 
 /**
@@ -13,7 +14,7 @@ class NumberedFilesLocatorSpec extends FlatSpec with Matchers {
   val locator = new NumberedFilesLocator
 
   it should "find existing files" in {
-    val paths = locator.paths("numbered") should matchPattern {
+    locator.paths("numbered") should matchPattern {
       case Seq((NumberedRevision(1), _), (NumberedRevision(2), _)) =>
     }
   }

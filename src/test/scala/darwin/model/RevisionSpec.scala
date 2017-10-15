@@ -1,8 +1,6 @@
-package darwin
+package darwin.model
 
 import org.scalatest.{FlatSpec, Matchers}
-
-import scala.io.{Codec, Source}
 
 /**
   * Created by gael on 27/09/17.

@@ -1,7 +1,7 @@
-package darwin
+package darwin.files
 
-import java.io.InputStream
-
+import darwin.Darwin
+import darwin.model.NumberedRevision
 import play.api.libs.Collections
 
 import scala.io.{BufferedSource, Codec, Source}

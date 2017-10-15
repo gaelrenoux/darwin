@@ -1,6 +1,6 @@
-package darwin
+package darwin.files
 
-import java.io.InputStream
+import darwin.model.Revision
 
 import scala.io.BufferedSource
 

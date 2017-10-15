@@ -3,8 +3,10 @@ package darwin
 import javax.inject.Singleton
 
 import com.google.inject.AbstractModule
+import darwin.files.{FilesLocator, ScriptFileParser}
+import darwin.model.Revision
 
-import scala.io.{Codec, Source}
+import scala.collection.Set
 
 /**
   * @author Gaël Renoux
@@ -25,10 +27,9 @@ class Darwin(locator: FilesLocator[Revision], parser: ScriptFileParser, dbName: 
   val scripts = fileContents map (parser.parse _).tupled
   files.foreach(_._2.close())
 
-  val (errorLefts, evolutionRights) = scripts map EvolutionFactory.prepare partition(_.isLeft)
-  if (errorLefts.nonEmpty) throw new IllegalArgumentException(errorLefts.map(_.left.get).mkString("\n"))
+  //TODO validate
 
-  val evolutions = evolutionRights.map(_.right.get)
+  val evolutions = scripts map (_.toEvolution)
 
 
 }
