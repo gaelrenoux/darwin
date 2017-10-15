@@ -16,7 +16,7 @@ class DarwinModule extends AbstractModule {
 }
 
 @Singleton
-class Darwin(locator: FilesLocator[Revision], parser: ScriptFileParser, dbName: String) {
+class Darwin(locator: FilesLocator[Revision], fileParser: ScriptFileParser, scriptParser: ScriptParser, dbName: String) {
 
   val files = locator.paths(dbName)
 
@@ -24,12 +24,12 @@ class Darwin(locator: FilesLocator[Revision], parser: ScriptFileParser, dbName: 
     (revision, src.getLines())
   }
 
-  val scripts = fileContents map (parser.parse _).tupled
+  val scripts = fileContents map (fileParser.parse _).tupled
   files.foreach(_._2.close())
 
   //TODO validate
 
-  val evolutions = scripts map (_.toEvolution)
+  val evolutions = scripts.map(scriptParser.parse)
 
 
 }

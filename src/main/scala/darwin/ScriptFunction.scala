@@ -1,17 +1,16 @@
-package darwin.files
+package darwin
 
-import darwin._
 import darwin.model.{Revision, Variable}
 
 /** This is a script file, with its elements in order. */
-case class ScriptFile(
+case class ScriptFunction(
                        revision: Revision,
                        parts: Seq[ScriptFilePart] = Seq()
                      ) {
 
-  import ScriptFile._
+  import ScriptFunction._
 
-  def :+(part: ScriptFilePart): ScriptFile = copy(parts = parts :+ part)
+  def :+(part: ScriptFilePart): ScriptFunction = copy(parts = parts :+ part)
 
   def toEvolution = Evolution(revision, parts.map(_.toEvolutionPart))
 
@@ -23,7 +22,7 @@ case class ScriptFile(
         val missingVariables = part.using -- availableVariables
         val additionalErrors = missingVariables.map(_.name).map(Error.MissingVariable.apply)
         val additionalVariable = part match {
-          case ScriptDefine(variable, _, _) => Some(variable)
+          case ScriptFunctionDefine(variable, _, _) => Some(variable)
           case _ => None
         }
         (errors ++ additionalErrors, usedVariables ++ part.using, availableVariables ++ additionalVariable)
@@ -33,7 +32,7 @@ case class ScriptFile(
 
 }
 
-object ScriptFile {
+object ScriptFunction {
 
   abstract class Error(val key: String, val message: String)
 

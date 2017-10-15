@@ -6,7 +6,6 @@ import play.api.Logger
 
 /**
   * Parses a script file and returns a Script object, with separated elements.
-  * Created by gael on 26/09/17.
   */
 class ScriptFileParser {
 
@@ -18,56 +17,64 @@ class ScriptFileParser {
   private val CommentMarker = """^#.*$""".r
   private val VariableMarker = """\$\{(\w+)\}""".r
 
-  private trait ReadingState
-  private object ReadingState {
-    object Unknown extends ReadingState
-    object Up extends ReadingState
-    object Down extends ReadingState
-    case class Define(variable: Variable) extends ReadingState
-  }
 
-  /** Given a script file, get a new ScriptFile with the new data */
-  private def integrate(script: ScriptFile, state: ReadingState, lines: Seq[String]): ScriptFile = {
-    val fileText = lines.mkString("\n")
-    val usedVariables = VariableMarker.findAllMatchIn(fileText) map { m =>
-      Variable(m.group(1))
-    } toSet
+  private case class ReadingVisitor private(
+                                             status: Status,
+                                             script: Script,
+                                             currentContent: String,
+                                             counter: Int
+                                           ) {
 
-    /* For a certain set of variable values, returns the script to execute */
-    def generatorFunction = ScriptFileParser.textToMappingToSql(fileText) _
+    def this(status: Status, script: Script) = this(status, script, "", 0)
 
-    state match {
-      case ReadingState.Unknown => script // ignoring text before comments defining up, down or define
-      case ReadingState.Up => script :+ ScriptUp(generatorFunction, usedVariables)
-      case ReadingState.Down => script :+ ScriptDown(generatorFunction, usedVariables)
-      case ReadingState.Define(variable) => script :+ ScriptDefine(variable, generatorFunction, usedVariables)
-    }
-  }
+    def addLine(line: String): ReadingVisitor = copy(currentContent = currentContent + "\n" + line)
 
-  def parse(revision: Revision, lines: TraversableOnce[String]): ScriptFile = {
-    val nonEmptyLines = lines.filter(_.trim.nonEmpty)
-    val (lastState, scriptFileMissingLastPart, lastAccum) =
-
-      nonEmptyLines.foldLeft((ReadingState.Unknown: ReadingState, ScriptFile(revision), Seq.empty[String])) {
-        /* State changes */
-        case ((state, script, accum), UpMarker()) =>
-          (ReadingState.Up, integrate(script, state, accum), Seq.empty)
-        case ((state, script, accum), DownMarker()) =>
-          (ReadingState.Down, integrate(script, state, accum), Seq.empty)
-        case ((state, script, accum), DefineMarker(variableName)) =>
-          (ReadingState.Define(Variable(variableName)), integrate(script, state, accum), Seq.empty)
-
-        /* Ignore comment lines */
-        case (stateScriptAccum, CommentMarker()) =>
-          stateScriptAccum
-
-        /* Reading from the file */
-        case ((state, script, accum), line) =>
-          (state, script, accum :+ line)
+    def changeStatus(newStatus: Status): ReadingVisitor = {
+      status match {
+        case Status.Unknown =>
+          new ReadingVisitor(newStatus, script) // ignoring text before comments defining up, down or define
+        case Status.Up =>
+          ReadingVisitor(newStatus, script :+ ScriptUp(counter, currentContent.trim), "", counter + 1)
+        case Status.Down =>
+          ReadingVisitor(newStatus, script :+ ScriptDown(counter, currentContent.trim), "", counter + 1)
+        case Status.Define(variable) =>
+          ReadingVisitor(newStatus, script :+ ScriptDefine(counter, variable, currentContent.trim), "", counter + 1)
       }
+    }
 
-    /* get the last line */
-    integrate(scriptFileMissingLastPart, lastState, lastAccum)
+    def terminate: Script = this.changeStatus(Status.Unknown).script
+  }
+
+  private trait Status
+
+  private object Status {
+
+    object Unknown extends Status
+
+    object Up extends Status
+
+    object Down extends Status
+
+    case class Define(variable: Variable) extends Status
+
+  }
+
+  def parse(revision: Revision, lines: TraversableOnce[String]): Script = {
+    val nonEmptyLines = lines.filter(_.trim.nonEmpty)
+    val finishedVisitor = nonEmptyLines.foldLeft(new ReadingVisitor(Status.Unknown, Script(revision))) {
+      /* State changes */
+      case (visitor, UpMarker()) => visitor.changeStatus(Status.Up)
+      case (visitor, DownMarker()) => visitor.changeStatus(Status.Down)
+      case (visitor, DefineMarker(variableName)) => visitor.changeStatus(Status.Define(Variable(variableName)))
+
+      /* Ignore comment lines */
+      case (visitor, CommentMarker()) => visitor
+
+      /* Reading from the file */
+      case (visitor, line) => visitor.addLine(line)
+    }
+
+    finishedVisitor.terminate
   }
 
 }
@@ -75,7 +82,7 @@ class ScriptFileParser {
 object ScriptFileParser {
   def textToMappingToSql(fileText: String)(values: Map[Variable, Value]): Sql = {
     val filledText = values.foldLeft(fileText) { case (text, (variable, value)) =>
-      text.replace("${" + variable.name +"}", value.wrapped)
+      text.replace("${" + variable.name + "}", value.wrapped)
     }
     Sql(filledText)
   }

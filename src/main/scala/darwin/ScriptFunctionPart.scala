@@ -1,9 +1,7 @@
-package darwin.files
+package darwin
 
-import darwin._
 import darwin.model.{Sql, Value, Variable}
 import darwin.util.IncrementalTupleIterator
-import play.api.libs.Collections
 
 /**
   * Created by gael on 15/10/17.
@@ -39,14 +37,14 @@ abstract class ScriptFilePart {
 
 }
 
-case class ScriptUp(content: Map[Variable, Value] => Sql, using: Set[Variable]) extends ScriptFilePart {
+case class ScriptFunctionUp(content: Map[Variable, Value] => Sql, using: Set[Variable]) extends ScriptFilePart {
   def toEvolutionPart = EvolutionUp(function)
 }
 
-case class ScriptDown(content: Map[Variable, Value] => Sql, using: Set[Variable]) extends ScriptFilePart {
+case class ScriptFunctionDown(content: Map[Variable, Value] => Sql, using: Set[Variable]) extends ScriptFilePart {
   def toEvolutionPart = EvolutionDown(function)
 }
 
-case class ScriptDefine(variable: Variable, content: Map[Variable, Value] => Sql, using: Set[Variable]) extends ScriptFilePart {
+case class ScriptFunctionDefine(variable: Variable, content: Map[Variable, Value] => Sql, using: Set[Variable]) extends ScriptFilePart {
   def toEvolutionPart = EvolutionDefine(variable, function)
 }

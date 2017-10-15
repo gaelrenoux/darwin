@@ -1,13 +1,14 @@
-package darwin.files
+package darwin
 
+import darwin.files.ScriptFileParser
 import darwin.model.{Sql, Value, Variable}
 import org.scalatest.{FlatSpec, Matchers}
 
 /**
   */
-class ScriptFilePartSpec extends FlatSpec with Matchers {
+class ScriptFunctionPartSpec extends FlatSpec with Matchers {
 
-  val up = ScriptUp(
+  val up = ScriptFunctionUp(
     content = ScriptFileParser.textToMappingToSql("select ${x} and ${y} from whatever"),
     using = Set("x", "y").map(Variable.apply)
   )

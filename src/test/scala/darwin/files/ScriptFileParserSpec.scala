@@ -1,6 +1,6 @@
 package darwin.files
 
-import darwin.Darwin
+import darwin._
 import darwin.model.{NumberedRevision, Sql, Value, Variable}
 import org.scalatest.{FlatSpec, Matchers}
 
@@ -19,35 +19,30 @@ class ScriptFileParserSpec extends FlatSpec with Matchers {
   private val parsed = parser.parse(NumberedRevision(2), lines)
   is.close()
 
-  val variableToValues = Map(
-    Variable("value") -> Value("XXX"),
-    Variable("stuffAgain_2") -> Value("333")
-  )
-
 
   behavior of "parse"
 
   it should "return the correct parts" in {
     parsed.parts(0) should matchPattern {
-      case ScriptUp(f, vars) if vars.isEmpty && f(Map()) == Sql("This is an up") =>
+      case ScriptUp(0, "This is an up") =>
     }
     parsed.parts(1) should matchPattern {
-      case ScriptDefine(Variable("value"), f, vars) if vars.isEmpty && f(variableToValues) == Sql("This is a define") =>
+      case ScriptDefine(1, Variable("value"), "This is a define") =>
     }
     parsed.parts(2) should matchPattern {
-      case ScriptDown(f, vars) if vars == Set(Variable("value")) && f(variableToValues) == Sql("This is a down with a XXX") =>
+      case ScriptDown(2, "This is a down with a ${value}") =>
     }
     parsed.parts(3) should matchPattern {
-      case ScriptUp(f, vars) if vars == Set(Variable("value")) && f(variableToValues) == Sql("This is another up with a XXX and the same XXX") =>
+      case ScriptUp(3, "This is another up with a ${value} and the same ${value}") =>
     }
     parsed.parts(4) should matchPattern {
-      case ScriptDown(f, vars) if vars.isEmpty && f(variableToValues) == Sql("This is another down") =>
+      case ScriptDown(4, "This is another down") =>
     }
     parsed.parts(5) should matchPattern {
-      case ScriptDefine(Variable("stuffAgain_2"), f, vars) if vars == Set(Variable("value")) && f(variableToValues) == Sql("This is another define with XXX") =>
+      case ScriptDefine(5, Variable("stuffAgain_2"), "This is another define with ${value}") =>
     }
     parsed.parts(6) should matchPattern {
-      case ScriptUp(f, vars) if vars == Set(Variable("value"), Variable("stuffAgain_2")) && f(variableToValues) == Sql("This is a last up with two variables: 333 and\nXXX") =>
+      case ScriptUp(6, "This is a last up with two variables: ${stuffAgain_2} and\n${value}") =>
     }
 
   }
