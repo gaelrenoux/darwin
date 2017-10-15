@@ -12,9 +12,3 @@ case class Evolution(
                       revision: Revision,
                       parts: Seq[EvolutionPart]
                     )
-
-object Evolution {
-
-
-
-}

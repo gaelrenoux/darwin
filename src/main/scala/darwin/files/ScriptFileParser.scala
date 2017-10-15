@@ -34,18 +34,13 @@ class ScriptFileParser {
     } toSet
 
     /* For a certain set of variable values, returns the script to execute */
-    def fromVariablesToScript(values: Map[Variable, Value]): Sql = {
-      val filledText = values.foldLeft(fileText) { case (text, (variable, value)) =>
-        text.replace("${" + variable.name +"}", value.wrapped)
-      }
-      Sql(filledText)
-    }
+    def generatorFunction = ScriptFileParser.textToMappingToSql(fileText) _
 
     state match {
       case ReadingState.Unknown => script // ignoring text before comments defining up, down or define
-      case ReadingState.Up => script :+ ScriptUp(fromVariablesToScript, usedVariables)
-      case ReadingState.Down => script :+ ScriptDown(fromVariablesToScript, usedVariables)
-      case ReadingState.Define(variable) => script :+ ScriptDefine(variable, fromVariablesToScript, usedVariables)
+      case ReadingState.Up => script :+ ScriptUp(generatorFunction, usedVariables)
+      case ReadingState.Down => script :+ ScriptDown(generatorFunction, usedVariables)
+      case ReadingState.Define(variable) => script :+ ScriptDefine(variable, generatorFunction, usedVariables)
     }
   }
 
@@ -75,6 +70,13 @@ class ScriptFileParser {
     integrate(scriptFileMissingLastPart, lastState, lastAccum)
   }
 
+}
 
-
+object ScriptFileParser {
+  def textToMappingToSql(fileText: String)(values: Map[Variable, Value]): Sql = {
+    val filledText = values.foldLeft(fileText) { case (text, (variable, value)) =>
+      text.replace("${" + variable.name +"}", value.wrapped)
+    }
+    Sql(filledText)
+  }
 }

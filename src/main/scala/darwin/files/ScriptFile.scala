@@ -6,12 +6,12 @@ import darwin.model.{Revision, Variable}
 /** This is a script file, with its elements in order. */
 case class ScriptFile(
                        revision: Revision,
-                       parts: Seq[ScriptPart] = Seq()
+                       parts: Seq[ScriptFilePart] = Seq()
                      ) {
 
   import ScriptFile._
 
-  def :+(part: ScriptPart): ScriptFile = copy(parts = parts :+ part)
+  def :+(part: ScriptFilePart): ScriptFile = copy(parts = parts :+ part)
 
   def toEvolution = Evolution(revision, parts.map(_.toEvolutionPart))
 
