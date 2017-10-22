@@ -1,15 +1,15 @@
 package darwin
 
+import com.typesafe.scalalogging.Logger
 import darwin.model.{Sql, Value, Variable}
 import darwin.util.IncrementalTupleIterator
-import play.api.Logger
 
 /**
   * Parses a script part and returns an Evolution object.
   */
 class ScriptParser {
 
-  private val log = Logger(classOf[ScriptParser])
+  private val log = Logger[ScriptParser]
 
   private val VariableMarker = """\$\{(\w+)\}""".r
 

@@ -2,7 +2,7 @@ package darwin.files
 
 import darwin.Darwin
 import darwin.model.NumberedRevision
-import play.api.libs.Collections
+import darwin.util.Collections
 
 import scala.io.{BufferedSource, Codec, Source}
 

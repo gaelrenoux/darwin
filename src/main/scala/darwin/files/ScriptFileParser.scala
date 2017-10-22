@@ -2,20 +2,19 @@ package darwin.files
 
 import darwin._
 import darwin.model.{Revision, Sql, Value, Variable}
-import play.api.Logger
+import com.typesafe.scalalogging.Logger
 
 /**
   * Parses a script file and returns a Script object, with separated elements.
   */
 class ScriptFileParser {
 
-  private val log = Logger(classOf[ScriptFileParser])
+  private val log = Logger[ScriptFileParser]
 
   private val UpMarker = """^#.*!Up.*$""".r
   private val DownMarker = """^#.*!Down.*$""".r
   private val DefineMarker = """^#.*!Define (.\w*).*$""".r
   private val CommentMarker = """^#.*$""".r
-  private val VariableMarker = """\$\{(\w+)\}""".r
 
 
   private case class ReadingVisitor private(

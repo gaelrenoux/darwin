@@ -2,11 +2,21 @@ package darwin.db
 
 import darwin.model.Sql
 
-trait SqlExecutor {
+import scala.concurrent.{ExecutionContext, Future}
 
-  /** Executes an update request (up or down) on the database */
-  def executeUpdate(sql: Sql): Int
 
-  /** Executes a define request on the database */
-  def executeDefine(sql: Sql): String
+trait SqlExecutor[T <: Transaction] {
+
+  protected def createTransaction: T
+
+  def transactional[A](treatment: T => Future[A])(implicit ec: ExecutionContext, transaction: T = createTransaction): Future[A]
+
+  /** Execute a SELECT query returning a String */
+  def selectString(sql: Sql)(implicit ec: ExecutionContext, transaction: T): Future[Seq[String]]
+
+  /** Execute a SELECT query returning an Seq of String */
+  def selectStringSeq(sql: Sql)(implicit ec: ExecutionContext, transaction: T): Future[Seq[Seq[String]]]
+
+  /** Executes an arbitrary UPDATE query */
+  def update(sql: Sql)(implicit ec: ExecutionContext, transaction: T): Future[Int]
 }

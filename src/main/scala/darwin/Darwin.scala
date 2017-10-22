@@ -1,21 +1,20 @@
 package darwin
 
-import javax.inject.Singleton
-
-import com.google.inject.AbstractModule
 import darwin.files.{FilesLocator, ScriptFileParser}
 import darwin.model.Revision
 
-import scala.collection.Set
+/*
 
-/**
-  * @author Gaël Renoux
-  */
+import javax.inject.Singleton
+
+import com.google.inject.AbstractModule
+
 class DarwinModule extends AbstractModule {
   override def configure(): Unit = bind(classOf[Darwin]).asEagerSingleton()
 }
 
 @Singleton
+*/
 class Darwin(locator: FilesLocator[Revision], fileParser: ScriptFileParser, scriptParser: ScriptParser, dbName: String) {
 
   val files = locator.paths(dbName)
