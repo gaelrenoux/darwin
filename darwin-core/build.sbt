@@ -1,5 +1,5 @@
 organization := "gaelrenoux"
-name := "darwin"
+name := "darwin-core"
 version := "1.0-SNAPSHOT"
 maintainer := "Gaël Renoux"
 
