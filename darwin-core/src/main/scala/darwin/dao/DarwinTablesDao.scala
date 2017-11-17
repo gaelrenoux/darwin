@@ -1,7 +1,6 @@
-package darwin.dao.postgresql
+package darwin.dao
 
-import darwin.dao.ScriptDao
-import darwin.db.{SqlExecutor, Transaction}
+import darwin.db.SqlExecutor
 import darwin.model.Sql
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -9,9 +8,9 @@ import scala.concurrent.{ExecutionContext, Future}
 /**
   * Created by gael on 22/10/17.
   */
-class ScriptPostgreDao[T <: Transaction](db: SqlExecutor[T]) extends ScriptDao {
+class DarwinTablesDao(exe: SqlExecutor) {
 
-  override def createTables()(implicit ec: ExecutionContext): Future[Unit] = db.transactional { implicit t =>
+  override def createTables()(implicit ec: ExecutionContext): Future[Unit] = exe.transactional { implicit t =>
     val scriptSql = Sql(
       """
         create table __darwin_script

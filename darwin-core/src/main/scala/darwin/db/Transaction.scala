@@ -1,17 +1,39 @@
 package darwin.db
 
+import darwin.Configuration
+
+import scala.concurrent.ExecutionContext
+
 /**
   * Created by gael on 22/10/17.
   */
-trait Transaction {
+class Transaction(dbName: Option[String])(implicit conf: Configuration) {
 
-  def start(): Unit
+  private[db] var connection: JdbcConnection = null
 
-  def commit(): Unit
+  private var status = 'not_started
 
-  def rollback(): Unit
+  def start()(implicit ec: ExecutionContext): Unit = {
+    connection = JdbcConnection(dbName)
+    status = 'started
+  }
 
-  def started: Boolean
+  def commit()(implicit ec: ExecutionContext): Unit = {
+    if (connection == null) throw new IllegalStateException("Transaction not started")
+    connection.commit()
+    connection.close()
+    status = 'committed
+  }
 
-  def terminated: Boolean
+  def rollback()(implicit ec: ExecutionContext): Unit = {
+    if (connection == null) throw new IllegalStateException("Transaction not started")
+    connection.rollback()
+    connection.close()
+    status = 'rollbacked
+  }
+
+  def started: Boolean = status == 'started
+
+  def terminated: Boolean = status == 'committed || status == 'rollbacked
+
 }

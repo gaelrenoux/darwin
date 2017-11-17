@@ -28,6 +28,8 @@ libraryDependencies ++= Seq(
 
   "org.scalatest" %% "scalatest" % V.scalatest % "test",
   "ch.qos.logback" % "logback-classic" % V.logback % "test"
+
+
 )
 
 resolvers ++= Seq(
