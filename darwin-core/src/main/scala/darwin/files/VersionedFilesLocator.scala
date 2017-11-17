@@ -2,17 +2,15 @@ package darwin.files
 
 import java.io.File
 
-import darwin.Darwin
 import darwin.model.VersionedRevision
 
 import scala.io.{BufferedSource, Codec, Source}
 
-/**
-  * Created by gael on 26/09/17.
-  */
+/** Get files named after the typical versioning scheme: A.B.C-Descriptor.sql, with an arbitrary nuber of numbers and a
+  * arbitrary descriptor. */
 class VersionedFilesLocator extends FilesLocator[VersionedRevision] {
 
-  private lazy val classLoader = classOf[Darwin].getClassLoader
+  private lazy val classLoader = classOf[VersionedFilesLocator].getClassLoader
 
   override def paths(dbName: String): Seq[(VersionedRevision, BufferedSource)] = {
     val folderPath = classLoader.getResource(s"darwin/$dbName")
@@ -21,7 +19,7 @@ class VersionedFilesLocator extends FilesLocator[VersionedRevision] {
 
     files map { f =>
       val revision = VersionedRevision(f.getName.dropRight(4)) //remove the .sql
-      val src = Source.fromFile(f)(Codec.UTF8)
+    val src = Source.fromFile(f)(Codec.UTF8)
       (revision, src)
     } sortBy (_._1)
   }

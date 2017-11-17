@@ -1,5 +1,6 @@
-package darwin
+package darwin.integration
 
+import darwin.ScriptParser
 import darwin.files.{FilesLocator, ScriptFileParser}
 import darwin.model.Revision
 

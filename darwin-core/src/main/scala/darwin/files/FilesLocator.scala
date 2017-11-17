@@ -5,12 +5,10 @@ import darwin.model.Revision
 import scala.io.BufferedSource
 
 
-/**
-  * Created by gael on 26/09/17.
-  */
+/** Traits for way to find an ordered series of files for SQL codes corresponding to each version. */
 trait FilesLocator[+T <: Revision] {
 
-  /** Returns the files to parse, ordered by their revision. */
+  /** Returns the content of the files to parse, ordered by their revision. */
   def paths(dbName: String): Seq[(T, BufferedSource)]
 
 }

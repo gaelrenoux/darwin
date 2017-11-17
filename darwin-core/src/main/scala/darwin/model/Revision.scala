@@ -2,14 +2,20 @@ package darwin.model
 
 import scala.annotation.tailrec
 
+/** A Revision is the identifier of a specific version. Several Revision schemes are possibles: see all subclasses. */
 sealed trait Revision
 
+/** Numbered Revisions, as in Play Evolutions: 1, 2, etc. The numbers must follow each other, without jumps. */
 case class NumberedRevision(number: Int) extends Revision with Ordered[NumberedRevision] {
   override def compare(that: NumberedRevision): Int = number.compare(that.number)
 
   override def toString: String = s"NR($number)"
 }
 
+/** Revisions versioned using multiple numbers (separated by points), followed by a descriptor. Typically: major
+  * version, minor version, patch version, and descriptor starting by a dash. It can use any number of numbers, though,
+  * and the descriptor can start by any non-digit character. It is ordered by the versioning numbers in order of
+  * apparition, and last by the descriptor. A missing element comes before an element with value (1.2 < 1.2.0). */
 case class VersionedRevision(numbers: List[Int], descriptor: Option[String]) extends Revision with Ordered[VersionedRevision] {
   override def compare(that: VersionedRevision): Int = {
     val numbersCompare = VersionedRevision.compare(numbers, that.numbers)

@@ -1,12 +1,10 @@
 package darwin.files
 
 import darwin._
-import darwin.model.{Revision, Sql, Value, Variable}
+import darwin.model._
 import com.typesafe.scalalogging.Logger
 
-/**
-  * Parses a script file and returns a Script object, with separated elements.
-  */
+/** Parses the content of a script file and returns a Script object, with separated elements. */
 class ScriptFileParser {
 
   private val log = Logger[ScriptFileParser]
@@ -58,6 +56,7 @@ class ScriptFileParser {
 
   }
 
+  /** Parse the lines coming from the script file. */
   def parse(revision: Revision, lines: TraversableOnce[String]): Script = {
     val nonEmptyLines = lines.filter(_.trim.nonEmpty)
     val finishedVisitor = nonEmptyLines.foldLeft(new ReadingVisitor(Status.Unknown, Script(revision))) {

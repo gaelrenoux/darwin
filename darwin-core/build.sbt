@@ -13,23 +13,21 @@ scalacOptions ++= Seq(
 /* Suppress problems with Scaladoc links */
 scalacOptions in(Compile, doc) ++= Seq("-no-link-warnings")
 
-val scalatestVersion = "3.0.1"
-val typesafeConfigVersion = "1.3.1"
-val scalaLoggingVersion = "3.7.2"
+val V = new {
+  val typesafeConfig = "1.3.1"
+  val scalaLogging = "3.7.2"
 
-/*
-val playVersion = "2.5.12"
-val playSlickVersion = "2.1.0"*/
+  val scalatest = "3.0.1"
+  val logback = "1.0.13"
+}
 
 libraryDependencies ++= Seq(
-  "org.scalatest" %% "scalatest" % scalatestVersion % "test",
 
-  "com.typesafe" % "config" % typesafeConfigVersion,
-  "com.typesafe.scala-logging" %% "scala-logging" % scalaLoggingVersion
-/*
-  "com.typesafe.play" %% "play" % playVersion,
-  "com.typesafe.play" %% "play-slick" % playSlickVersion,
-  "com.typesafe.play" %% "play-slick-evolutions" % playSlickVersion*/
+  "com.typesafe" % "config" % V.typesafeConfig,
+  "com.typesafe.scala-logging" %% "scala-logging" % V.scalaLogging,
+
+  "org.scalatest" %% "scalatest" % V.scalatest % "test",
+  "ch.qos.logback" % "logback-classic" % V.logback % "test"
 )
 
 resolvers ++= Seq(

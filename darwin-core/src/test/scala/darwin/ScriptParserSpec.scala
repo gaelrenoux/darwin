@@ -1,6 +1,7 @@
 package darwin
 
 import darwin.files.ScriptFileParser
+import darwin.integration.Darwin
 import darwin.model.{NumberedRevision, Sql, Value, Variable}
 import org.scalatest.{FlatSpec, Matchers}
 
@@ -28,10 +29,15 @@ class ScriptParserSpec extends FlatSpec with Matchers {
     Variable("stuffAgain_2") -> Seq(Value("Y1"), Value("Y2"))
   )
 
+  val variableToNoValue = Map(
+    Variable("value") -> Seq(),
+    Variable("stuffAgain_2") -> Seq()
+  )
+
 
   behavior of "parse"
 
-  it should "return the correct evolutions for simple elements" in {
+  it should "return the correct scripts for simple elements" in {
     parsed.parts(0)(variableToValuesSimple) should be(Seq(Sql("This is an up")))
     parsed.parts(1)(variableToValuesSimple) should be(Seq(Sql("This is a define")))
     parsed.parts(2)(variableToValuesSimple) should be(Seq(Sql("This is a down with a XXX")))
@@ -41,7 +47,7 @@ class ScriptParserSpec extends FlatSpec with Matchers {
     parsed.parts(6)(variableToValuesSimple) should be(Seq(Sql("This is a last up with two variables: 333 and\nXXX")))
   }
 
-  it should "return the correct evolutions for multiple elements" in {
+  it should "return the correct scripts for multiple elements" in {
     parsed.parts(0)(variableToValues) should be(Seq(Sql("This is an up")))
     parsed.parts(1)(variableToValues) should be(Seq(Sql("This is a define")))
     parsed.parts(2)(variableToValues) should be(Seq(Sql("This is a down with a X1"), Sql("This is a down with a X2"), Sql("This is a down with a X3")))
@@ -57,5 +63,15 @@ class ScriptParserSpec extends FlatSpec with Matchers {
       Sql("This is a last up with two variables: Y1 and\nX3"),
       Sql("This is a last up with two variables: Y2 and\nX3")
     ))
+  }
+
+  it should "return the correct scripts for no element" in {
+    parsed.parts(0)(variableToNoValue) should be(Seq(Sql("This is an up")))
+    parsed.parts(1)(variableToNoValue) should be(Seq(Sql("This is a define")))
+    parsed.parts(2)(variableToNoValue) should be(Seq())
+    parsed.parts(3)(variableToNoValue) should be(Seq())
+    parsed.parts(4)(variableToNoValue) should be(Seq(Sql("This is another down")))
+    parsed.parts(5)(variableToNoValue) should be(Seq())
+    parsed.parts(6)(variableToNoValue) should be(Seq())
   }
 }

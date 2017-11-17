@@ -1,17 +1,15 @@
 package darwin.files
 
-import darwin.Darwin
 import darwin.model.NumberedRevision
 import darwin.util.Collections
 
 import scala.io.{BufferedSource, Codec, Source}
 
-/**
-  * Created by gael on 26/09/17.
-  */
+/** Gets files by following natural ordering: 1.sql, 2.sql, etc. Any missing file means the sequence will stop
+  * there (i.e., if there are files 1.sql, 2.sql and 4.sql, only 1.sql and 2.sql will be returned. */
 class NumberedFilesLocator extends FilesLocator[NumberedRevision] {
 
-  lazy val classLoader: ClassLoader = classOf[Darwin].getClassLoader
+  lazy val classLoader: ClassLoader = classOf[NumberedFilesLocator].getClassLoader
 
   override def paths(dbName: String): Seq[(NumberedRevision, BufferedSource)] =
     Collections.unfoldLeft(1) { revision =>

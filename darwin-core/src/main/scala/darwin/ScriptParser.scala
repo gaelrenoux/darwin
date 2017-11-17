@@ -1,7 +1,7 @@
 package darwin
 
 import com.typesafe.scalalogging.Logger
-import darwin.model.{Sql, Value, Variable}
+import darwin.model._
 import darwin.util.IncrementalTupleIterator
 
 /**
@@ -18,9 +18,10 @@ class ScriptParser {
     Evolution(script.revision, evoParts)
   }
 
-  def parsePart(part: ScriptPart): EvolutionPart = {
+  /** Parses a Script part, and returns an Evolution part. */
+  private def parsePart(part: ScriptPart): EvolutionPart = {
     val usedVariables = VariableMarker.findAllMatchIn(part.content).map(_.group(1)).map(Variable.apply).toSet
-    val sqlGeneration = ScriptParser.textToMappingToSql(part.content) _
+    val sqlGeneration = textToMappingToSql(part.content) _
     val multipleSqlGeneration = applyForMultipleValues(sqlGeneration, usedVariables) _
 
     part match {
@@ -28,6 +29,14 @@ class ScriptParser {
       case ScriptDown(_, _) => EvolutionDown(multipleSqlGeneration)
       case ScriptDefine(_, variable, _) => EvolutionDefine(variable, multipleSqlGeneration)
     }
+  }
+
+  /** Takes a text, then a set of values (associated to variables), and return the appropriate SQL. */
+  private def textToMappingToSql(fileText: String)(values: Map[Variable, Value]): Sql = {
+    val filledText = values.foldLeft(fileText) { case (text, (variable, value)) =>
+      text.replace("${" + variable.name + "}", value.wrapped)
+    }
+    Sql(filledText)
   }
 
   private def applyForMultipleValues(
@@ -59,15 +68,3 @@ class ScriptParser {
   }
 
 }
-
-object ScriptParser {
-
-  /** Takes a text, then a set of values (associated to variables), and return the appropriate SQL. */
-  def textToMappingToSql(fileText: String)(values: Map[Variable, Value]): Sql = {
-    val filledText = values.foldLeft(fileText) { case (text, (variable, value)) =>
-      text.replace("${" + variable.name + "}", value.wrapped)
-    }
-    Sql(filledText)
-  }
-}
-

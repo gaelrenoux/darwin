@@ -4,8 +4,8 @@ import scala.annotation.tailrec
 
 /**
   * This class counts on tuples of Int, increment a tuple starting with the leftmost element, reducing it to zero with
-  * a leftover to the next if it reaches the limit. If there is no element left to apply the leftover to, it will fail
-  * and return None.
+  * a leftover to the next if it reaches the limit for the current element. If there is no element left to apply the
+  * leftover to, it will return None.
   *
   * Please note, the limit is not included. If the limit is 10, then the integers will only be go from 0 to 9.
   */

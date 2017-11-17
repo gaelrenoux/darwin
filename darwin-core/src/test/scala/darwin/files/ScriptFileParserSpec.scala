@@ -1,7 +1,7 @@
 package darwin.files
 
-import darwin._
-import darwin.model.{NumberedRevision, Sql, Value, Variable}
+import darwin.integration.Darwin
+import darwin.model._
 import org.scalatest.{FlatSpec, Matchers}
 
 import scala.io.{Codec, Source}

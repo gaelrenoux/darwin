@@ -1,10 +1,6 @@
-package darwin
+package darwin.model
 
-import darwin.model.{Sql, Value, Variable}
-
-/**
-  * An yet unparsed element in a script: either an up, a down or a define
-  */
+/** En element in a script: either an up, a down or a define. The content has not been parsed yet. */
 abstract class ScriptPart {
   /** Order within the script */
   val order: Int

@@ -1,10 +1,6 @@
 package darwin.util
 
-/**
-  * Created by gael on 22/10/17.
-  */
 object Collections {
-
 
   /**
     * Produces a Seq from a seed and a function. Copied from play.api.libs.Collections.
