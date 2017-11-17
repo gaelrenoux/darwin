@@ -1,4 +1,4 @@
-package darwin
+package darwin.files
 
 import com.typesafe.scalalogging.Logger
 import darwin.model._

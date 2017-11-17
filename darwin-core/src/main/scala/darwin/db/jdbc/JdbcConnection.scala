@@ -1,42 +1,52 @@
-package darwin.db
+package darwin.db.jdbc
 
 import java.sql.{DriverManager, ResultSet, SQLWarning, Statement}
 import java.util.Properties
 
 import darwin.Configuration
+import darwin.model.Sql
 
 import scala.annotation.tailrec
-import scala.concurrent.{ExecutionContext, Future, blocking}
 
 
 /** Connection to the database. Entry point for all SQL queries. Can only be used within the jdbc package. */
 private[db] class JdbcConnection(private val connection: java.sql.Connection) {
 
-  def commit()(implicit ec: ExecutionContext): Future[Unit] = Future(blocking(connection.commit()))
+  def commit(): Unit = connection.commit()
 
-  def rollback()(implicit ec: ExecutionContext): Future[Unit] = Future(blocking(connection.rollback()))
+  def rollback(): Unit = connection.rollback()
 
-  def close()(implicit ec: ExecutionContext): Future[Unit] = Future(blocking {
+  def close(): Unit = {
     connection.rollback()
     connection.close()
-  })
+  }
 
-  def getWarnings(implicit ec: ExecutionContext): Future[List[SQLWarning]] = Future(blocking {
+  def getWarnings: List[SQLWarning] = {
     collect(Option(connection.getWarnings.getNextWarning))
-  })
+  }
 
-  def select[A](sql: String)(process: ResultSet => A)(implicit ec: ExecutionContext): Future[Seq[A]] = Future(blocking {
+  /** Execute an arbirtrary SELECT query, with a process to convert the ResultSet to an A */
+  def select[A](sql: String)(process: ResultSet => A): Seq[A] = {
     withStatement { st =>
       val rs = st.executeQuery(sql)
       processResultSet(process)(rs)
     }
-  })
+  }
 
-  def update(sql: String)(implicit ec: ExecutionContext): Future[Int] = Future(blocking {
+  /** Execute a SELECT query returning a String */
+  def selectString(sql: Sql): Seq[String] = select[String](sql.wrapped)(_.getString(1))
+
+  /** Execute a SELECT query returning an Seq of String */
+  def selectStringSeq(sql: Sql): Seq[Seq[String]] = select[Seq[String]](sql.wrapped) { rs =>
+    val c = rs.getMetaData.getColumnCount
+    for (i <- 1 to c) yield rs.getString(i)
+  }
+
+  def update(sql: String): Int = {
     withStatement { st =>
       st.executeUpdate(sql)
     }
-  })
+  }
 
   private def withStatement[A](block: Statement => A): A = {
     val statement = connection.createStatement

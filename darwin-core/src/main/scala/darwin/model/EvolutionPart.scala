@@ -1,6 +1,4 @@
-package darwin
-
-import darwin.model.{Sql, Value, Variable}
+package darwin.model
 
 /** A single part in an evolution. Takes a map of variables to values, and produces the resulting SQL Scripts to
   * execute.

@@ -1,7 +1,6 @@
 package darwin.integration
 
-import darwin.ScriptParser
-import darwin.files.{FilesLocator, ScriptFileParser}
+import darwin.files.{FilesLocator, ScriptFileParser, ScriptParser}
 import darwin.model.Revision
 
 /*

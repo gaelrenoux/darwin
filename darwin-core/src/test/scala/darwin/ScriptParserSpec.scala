@@ -1,7 +1,6 @@
 package darwin
 
-import darwin.files.ScriptFileParser
-import darwin.integration.Darwin
+import darwin.files.{ScriptFileParser, ScriptParser}
 import darwin.model.{NumberedRevision, Sql, Value, Variable}
 import org.scalatest.{FlatSpec, Matchers}
 
